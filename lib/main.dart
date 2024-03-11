@@ -20,7 +20,41 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+class FlutterExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      body: new ListView(
+        children: new List.generate(5, (i)=>new ListTileItem(
+          title: "Item#$i",
+        )),
+      ),
+    );
+  }
+}
+class ListTileItem extends StatefulWidget {
+  String title;
+  ListTileItem({this.title});
+  @override
+  _ListTileItemState createState() => new _ListTileItemState();
+}
 
+class _ListTileItemState extends State<ListTileItem> {
+  int _itemCount = 0;
+  @override
+  Widget build(BuildContext context) {
+    return new ListTile(
+      title: new Text(widget.title),
+      trailing: new Row(
+        children: <Widget>[
+          _itemCount!=0? new  IconButton(icon: new Icon(Icons.remove),onPressed: ()=>setState(()=>_itemCount--),):new Container(),
+          new Text(_itemCount.toString()),
+          new IconButton(icon: new Icon(Icons.add),onPressed: ()=>setState(()=>_itemCount++))
+        ],
+      ),
+    );
+  }
+}
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   final String title;
@@ -28,6 +62,8 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 class _MyHomePageState extends State<MyHomePage> {
+  final myController = TextEditingController();
+  final myController1 = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 20,
                 width: 500,
                 child:TextFormField(
+                  controller: myController,
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
                     labelText: 'Enter your email id',
@@ -77,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 20,
                 width: 500,
                 child:TextFormField(
+                  controller: myController1,
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
                     labelText: 'Enter your Password',
@@ -91,10 +129,15 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           ElevatedButton(
               onPressed: () {
+                if (myController.text == "kashishshah3233@gmail.com"){
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SecondRoute()),
                 );
+              }
+                else{
+                  child:Text('Enter a valid user name');
+                }
               },
               child: const Text(
                 'Submit'
@@ -173,7 +216,9 @@ class ThirdRoutes extends StatelessWidget {
                 width: 50,
               ),
               const ElevatedButton(
-                onPressed: null,
+                onPressed: () {
+                  build(FlutterExample())
+                },
                 child: Text(
                   'Sula Shiraz Cabernet 375 Ml ₹381',
                   style: TextStyle(fontWeight: FontWeight.bold,fontSize: 10,color:Color.fromRGBO(146, 104, 129, 1.0)),
