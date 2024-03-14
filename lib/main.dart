@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Auth_Exceptions.dart';
 import 'firebase_options.dart';
+import 'globals.dart' as global;
 
 void main() async {
   await Firebase.initializeApp(
@@ -278,9 +279,15 @@ class SecondRoute extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ThirdRoutes()),
-                         );
-                        },
+                          MaterialPageRoute(
+                            builder: (context) => ThirdRoutes(
+                              count1: global.count1,
+                              count2: global.count2,
+                              count3: global.count3,
+                            ),
+                          ),
+                        );
+                      },
                       child: const Text(
                         'Wines',
                         style: TextStyle(fontWeight: FontWeight.bold,fontSize: 100,color:Color.fromRGBO(146, 104, 129, 1.0)),
@@ -296,7 +303,11 @@ class SecondRoute extends StatelessWidget {
     );
   }
 }
-class  CounterPage extends StatefulWidget {
+class CounterPage extends StatefulWidget {
+  final Function(int) onCountChanged;
+
+  const CounterPage({Key? key, required this.onCountChanged}) : super(key: key);
+
   @override
   _CounterPageState createState() => _CounterPageState();
 }
@@ -307,6 +318,7 @@ class _CounterPageState extends State<CounterPage> {
   void _incrementCounter() {
     setState(() {
       _count++;
+      widget.onCountChanged(_count); // Notify the parent widget about the count change
     });
   }
 
@@ -314,43 +326,42 @@ class _CounterPageState extends State<CounterPage> {
     setState(() {
       if (_count > 0) {
         _count--;
-       }
+        widget.onCountChanged(_count); // Notify the parent widget about the count change
       }
-    );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.remove),
-              onPressed: _decrementCounter,
-            ),
-            Text(
-              '$_count',
-              style: TextStyle(fontSize: 20),
-            ),
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: _incrementCounter,
-             ),
-           ],
-         ),
-      );
-   }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.remove),
+          onPressed: _decrementCounter,
+        ),
+        Text(
+          '$_count',
+          style: TextStyle(fontSize: 20),
+        ),
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: _incrementCounter,
+        ),
+      ],
+    );
+  }
 }
 
+
 class ThirdRoutes extends StatelessWidget {
-  const ThirdRoutes({super.key});
+  final int count1;
+  final int count2;
+  final int count3;
+  const ThirdRoutes({super.key, required this.count1, required this.count2, required this.count3});
 
   @override
   Widget build(BuildContext context) {
-    int a;
-    int b;
-    int c;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose Your Wines'),
@@ -406,7 +417,7 @@ class ThirdRoutes extends StatelessWidget {
                 Container(
                   width:200,
                   height:50,
-                  child: CounterPage(),
+                  child: CounterPage(onCountChanged: (int ) {  },),
                 ),
                     ],
                   ),
@@ -435,7 +446,7 @@ class ThirdRoutes extends StatelessWidget {
               Container(
                 width:200,
                 height:50,
-                child: CounterPage(),
+                child: CounterPage(onCountChanged: (int ) {  },),
               ),
             ],
           ),
@@ -464,31 +475,31 @@ class ThirdRoutes extends StatelessWidget {
               Container(
                 width:200,
                 height:50,
-                child: CounterPage(),
+                child: CounterPage(onCountChanged: (int ) {  },),
               ),
             ],
           ),
       ),
           Text(''),
-          ElevatedButton(
-            onPressed: () async {
-              var db = FirebaseFirestore.instance;
-              final order = <String, dynamic>{
-                "Sula Shiraz Cabernet 375 Ml ₹381": ,
-                "FRATELLI CABERNET SAUVIGNON  ₹1000": ,
-                "Pinot Noir  ₹12,495":
-              };
+            ElevatedButton(
+              onPressed: () async {
+                var db = FirebaseFirestore.instance;
+                final order = <String, dynamic>{
+                  "Sula Shiraz Cabernet 375 Ml ₹381": count1,
+                  "FRATELLI CABERNET SAUVIGNON  ₹1000": count2,
+                  "Pinot Noir  ₹12,495": count3,
+                };
 
-// Add a new document with a generated ID
-              db.collection("users").add(user).then((DocumentReference doc) =>
-                  print('DocumentSnapshot added with ID: ${doc.id}'));
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FourthRoute()),
-              );
-            },
-            child: const Text('Submit your order'),
-          ),
+                // Add a new document with a generated ID
+                db.collection("order").add(order).then((DocumentReference doc) =>
+                    print('DocumentSnapshot added with ID: ${doc.id}'));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FourthRoute()),
+                );
+              },
+              child: const Text('Submit your order'),
+            ),
           const Text(
             '',
             style: TextStyle(fontSize: 10),
@@ -507,64 +518,94 @@ class ThirdRoutes extends StatelessWidget {
     );
   }
 }
-
-
 class FourthRoute extends StatelessWidget {
-  const FourthRoute({super.key});
+  const FourthRoute({Key? key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         title: const Text('Your Cart'),
-    foregroundColor: Colors.white,
-    backgroundColor: const Color.fromRGBO(146, 104, 129, 1.0),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () {
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () {
-
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.info_outline),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => _DetailsPageState()),
-                );
-              },
-            ),
-          ],
-    ),
-
-        body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          const Text('Your order',
-          style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color:Color.fromRGBO(146, 104, 129, 1.0)
+        foregroundColor: Colors.white,
+        backgroundColor: const Color.fromRGBO(146, 104, 129, 1.0),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {},
           ),
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () {},
           ),
-          const Text('  ',
-            style: TextStyle(
-              fontSize: 300
-            ),
-          ),
-          ElevatedButton(
+          IconButton(
+            icon: const Icon(Icons.info_outline),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ThirdRoutes()),
+                MaterialPageRoute(builder: (context) => _DetailsPageState()),
               );
             },
-            child: const Text('Go back!'),
           ),
         ],
+      ),
+      body: FutureBuilder<QuerySnapshot>(
+        future: FirebaseFirestore.instance.collection('order').get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          // If data is available, display it
+          final orders = snapshot.data!.docs;
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              const Text(
+                'Your order',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Color.fromRGBO(146, 104, 129, 1.0),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: orders.length,
+                  itemBuilder: (context, index) {
+                    final orderData =
+                    orders[index].data() as Map<String, dynamic>;
+                    // Customize the display according to your order data structure
+                    return ListTile(
+                      title: Text(orderData['itemName']),
+                      subtitle:
+                      Text('Quantity: ${orderData['quantity']}'),
+                    );
+                  },
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ThirdRoutes(
+                        count1: global.count1,
+                        count2: global.count2,
+                        count3: global.count3,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Go back!'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
